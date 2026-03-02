@@ -41,46 +41,124 @@ enum MockHexColor: ShapeStyle, CaseIterable{
     }
 }
 
-struct HexPosition {
+enum Direction: CaseIterable {
+    case east
+    case west
+    case northWest
+    case northEast
+    case southWest
+    case southEast
+
+    var vector: (x: Int, y: Int) {
+        switch self {
+        case .northEast: return (x: 1, y: -1)
+        case .east: return (x: 2, y: 0)
+        case .southEast: return (x: 1, y: 1)
+        case .southWest: return (x: -1, y: 1)
+        case .west: return (x: -2, y: 0)
+        case .northWest: return (x: -1, y: -1)
+        }
+    }
+}
+
+struct HexagonModel: Hashable {
+    let position: HexPosition
+    let center: CGPoint
+    let size: CGFloat
+    let vertices: [CGPoint]
+    init(position: HexPosition, center: CGPoint, size: CGFloat = 40) {
+        self.position = position
+        self.center = center
+        self.size = size
+        self.vertices = [
+            CGPoint.hexagonVertex(for: center, with: size, at: 0),
+            CGPoint.hexagonVertex(for: center, with: size, at: 1),
+            CGPoint.hexagonVertex(for: center, with: size, at: 2),
+            CGPoint.hexagonVertex(for: center, with: size, at: 3),
+            CGPoint.hexagonVertex(for: center, with: size, at: 4),
+            CGPoint.hexagonVertex(for: center, with: size, at: 5)
+        ]
+    }
+}
+
+struct GridModel {
+    let hexagonModels: [HexagonModel]
+    let placeableVertices: [HexagonModel: Set<CGPoint>]
+
+    init(hexagonModels: [HexagonModel]) {
+        self.hexagonModels = hexagonModels
+        self.placeableVertices = Self.getPlaceableVertices(from: hexagonModels)
+    }
+
+    private static func getPlaceableVertices(from hexagonModels: [HexagonModel]) -> [HexagonModel: Set<CGPoint>] {
+        var result: [HexagonModel: Set<CGPoint>] = [:]
+        for model in hexagonModels {
+            let column = model.position.column
+            let row = model.position.row
+
+            for direction in Direction.allCases {
+
+                let possibleHexPosition = HexPosition(column: column + direction.vector.x, row: row + direction.vector.y)
+//                print("New column: \(column) + \(direction.vector.x)")
+//                print("New row: \(row) + \(direction.vector.y)")
+                //print("Direction: \(direction), CP: (\(column), \(row)), PP: (\(possibleHexPosition.column), \(possibleHexPosition.row)), result: \(hexagonModels.map(\.position).contains(possibleHexPosition))")
+                if hexagonModels.map(\.position).contains(possibleHexPosition) {
+                    switch direction{
+                    case .northEast:
+                        result[model, default: []].insert(CGPoint.hexagonVertex(for: model.center, with: model.size+1, at: 5))
+                        result[model, default: []].insert(CGPoint.hexagonVertex(for: model.center, with: model.size+1, at: 0))
+                    case .east:
+                        result[model, default: []].insert(CGPoint.hexagonVertex(for: model.center, with: model.size+1, at: 0))
+                        result[model, default: []].insert(CGPoint.hexagonVertex(for: model.center, with: model.size+1, at: 1))
+                    case .southEast:
+                        result[model, default: []].insert(CGPoint.hexagonVertex(for: model.center, with: model.size+1, at: 1))
+                        result[model, default: []].insert(CGPoint.hexagonVertex(for: model.center, with: model.size+1, at: 2))
+                    case .southWest:
+                        result[model, default: []].insert(CGPoint.hexagonVertex(for: model.center, with: model.size+1, at: 2))
+                        result[model, default: []].insert(CGPoint.hexagonVertex(for: model.center, with: model.size+1, at: 3))
+                    case .west:
+                        result[model, default: []].insert(CGPoint.hexagonVertex(for: model.center, with: model.size+1, at: 3))
+                        result[model, default: []].insert(CGPoint.hexagonVertex(for: model.center, with: model.size+1, at: 4))
+                    case .northWest:
+                        result[model, default: []].insert(CGPoint.hexagonVertex(for: model.center, with: model.size+1, at: 4))
+                        result[model, default: []].insert(CGPoint.hexagonVertex(for: model.center, with: model.size+1, at: 5))
+                    }
+                }
+            }
+        }
+        return result
+    }
+}
+
+struct HexPosition: Hashable {
     let column: Int
     let row: Int
 }
 
-func getHexCenter(for size: Double, at position: HexPosition) -> CGPoint {
-    let x = sqrt(3)/2  * Double(position.column)
-    let y = 3.0/2 * Double(position.row)
 
-    return CGPoint(x: (size+1) * x, y: (size+1) * y)
-}
-
-func gridCenters() -> [HexPosition] {
-    var result: [HexPosition] = []
-    for i in -4...4 {
-        for j in -2...2 {
-            if (i + j) % 2 == 0 && !(abs(i) == 4 && abs(j) == 2) {
-                result.append(HexPosition(column: i, row: j))
-            }
-        }
-    }
-    return result
-
-}
 
 struct ContentView: View {
     var body: some View {
-        let hexCenters = gridCenters().map { hexPosition in
-            getHexCenter(for: 40, at: hexPosition)
-        }
-        
         ZStack {
-            ForEach(hexCenters, id: \.self) { center in
-                Hex(size: 40, adjustment: 0, hexCenter: center)
-                    .foregroundStyle(MockHexColor.random)
-            }
+            HexagonGrid()
+                .onTapGesture {
+                    print("hello")
+                }
+//                if let vertices = gridModel.placeableVertices[model] {
+//                    ForEach(Array(vertices), id: \.self) { vertex in
+//                        Circle()
+//                            .fill(Color.red)
+//                            .frame(width: 8, height: 8)
+//                            .position(vertex)
+//                    }
+//                }
         }
-        .offset(x: 200, y: 200)
     }
 }
+
+
+
+
 
 #Preview {
     ContentView()

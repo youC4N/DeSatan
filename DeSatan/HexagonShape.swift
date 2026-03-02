@@ -8,11 +8,10 @@
 import SwiftUI
 
 struct Hex: Shape {
-    let size: CGFloat
-    let adjustment: CGFloat
     let hexCenter: CGPoint
-    func path(in center: CGRect) -> Path {
-
+    let adjustment: CGFloat
+    let size: CGFloat
+    func path(in rect: CGRect) -> Path {
         let vertices: [CGPoint] = [
             CGPoint.hexagonVertex(for: hexCenter, with: size, at: 0),
             CGPoint.hexagonVertex(for: hexCenter, with: size, at: 1),
@@ -21,7 +20,6 @@ struct Hex: Shape {
             CGPoint.hexagonVertex(for: hexCenter, with: size, at: 4),
             CGPoint.hexagonVertex(for: hexCenter, with: size, at: 5)
         ]
-
         let nextVertices = vertices[1...] + [CGPoint.hexagonVertex(for: hexCenter, with: size, at: 0)]
 
         var path = Path()
@@ -57,4 +55,49 @@ struct Hex: Shape {
         }
         return path
     }
+    
+    init(hexCenter: CGPoint, adjustment: CGFloat, size: CGFloat) {
+        self.adjustment = adjustment
+        self.hexCenter = hexCenter
+        self.size = size
+    }
 }
+
+
+
+struct HexagonGrid: Shape {
+    func path(in rect: CGRect) -> Path {
+        let center = CGPoint(x: rect.midX, y: rect.midY)
+        let hexagonPositions = getHexPosition()
+        let size = (rect.width-10*1)/(5*sqrt(3))
+        var path = Path()
+        for position in hexagonPositions {
+            var hexCenter = getHexCenter(for: size, at: position)
+            hexCenter = CGPoint(x: hexCenter.x+rect.width/2, y: hexCenter.y + rect.height/2)
+            path.addPath(Hex(hexCenter: hexCenter, adjustment: 0.1, size: size).path(in: rect))
+        }
+
+        return path
+    }
+
+    private func getHexCenter(for size: Double, at position: HexPosition) -> CGPoint {
+        let x = sqrt(3)/2  * Double(position.column)
+        let y = 3.0/2 * Double(position.row)
+
+        return CGPoint(x: (size+1) * x, y: (size+1) * y)
+    }
+    private func getHexPosition() -> [HexPosition] {
+        var result: [HexPosition] = []
+        for i in -4...4 {
+            for j in -2...2 {
+                if (i + j) % 2 == 0 && !(abs(i) == 4 && abs(j) == 2) {
+                    result.append(HexPosition(column: i, row: j))
+                }
+            }
+        }
+        return result
+    }
+
+}
+
+
