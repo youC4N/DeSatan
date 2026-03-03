@@ -7,21 +7,14 @@
 
 import SwiftUI
 
-struct Hex: Shape {
-    let position: HexPosition
+struct HexagonShape: Shape {
     let adjustment: CGFloat
+    let size: CGFloat
+    let center: CGPoint
+    let vertices: [CGPoint]
+    
     func path(in rect: CGRect) -> Path {
-        let size: CGFloat = (rect.width-10*1)/(5*sqrt(3))
-        let hexCenter: CGPoint = getHexCenter(for: size, at: position) + CGPoint(x: rect.midX, y: rect.midY)
-        let vertices: [CGPoint] = [
-            CGPoint.hexagonVertex(for: hexCenter, with: size, at: 0),
-            CGPoint.hexagonVertex(for: hexCenter, with: size, at: 1),
-            CGPoint.hexagonVertex(for: hexCenter, with: size, at: 2),
-            CGPoint.hexagonVertex(for: hexCenter, with: size, at: 3),
-            CGPoint.hexagonVertex(for: hexCenter, with: size, at: 4),
-            CGPoint.hexagonVertex(for: hexCenter, with: size, at: 5)
-        ]
-        let nextVertices = vertices[1...] + [CGPoint.hexagonVertex(for: hexCenter, with: size, at: 0)]
+        let nextVertices = vertices[1...] + [CGPoint.hexagonVertex(for: center, with: size, at: 0)]
 
         var path = Path()
         guard !vertices.isEmpty,
@@ -43,7 +36,7 @@ struct Hex: Shape {
 
             let cornerRadius = 1/tan(.pi/6) * adjustment * side
             let cornerAdjustment = 2 * adjustment
-            let cornerCenter = CGPoint.interpolatedPoint(from: hexCenter, to: next, by: cornerAdjustment)
+            let cornerCenter = CGPoint.interpolatedPoint(from: center, to: next, by: cornerAdjustment)
 
             path.addLine(to: cutoffPoint)
             path.addArc(
@@ -55,11 +48,5 @@ struct Hex: Shape {
             )
         }
         return path
-    }
-    private func getHexCenter(for size: Double, at position: HexPosition) -> CGPoint {
-        let x = sqrt(3)/2  * Double(position.column)
-        let y = 3.0/2 * Double(position.row)
-
-        return CGPoint(x: (size+1) * x, y: (size+1) * y)
     }
 }

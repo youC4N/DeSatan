@@ -35,31 +35,23 @@ struct HexPosition: Hashable {
 
 
 struct ContentView: View {
-    let positions = getHexPosition()
+    let coreGameModel = CoreGame()
     var body: some View {
         ZStack {
-            ForEach(positions, id: \.self) { position in
-                Hex(position: position, adjustment: 0.1)
-                    .onTapGesture {
-                        print(position)
-                    }
+            GeometryReader { geometry in
+                let rect = geometry.frame(in: .global)
+                let gridLayoutEngine = GridLayoutEngine(positions: coreGameModel.hexPositions, width: rect.width, height: rect.height)
+                ForEach(gridLayoutEngine.hexCenters, id: \.self) { center in
+                    let hexGeometry = HexagonGeometry(size: gridLayoutEngine.hexSize, center: center)
+                    HexagonShape(adjustment: gridLayoutEngine.hexCornerRatio, size: gridLayoutEngine.hexSize, center: center, vertices: hexGeometry.vertices)
+                }
             }
         }
     }
 }
 
 
-func getHexPosition() -> [HexPosition] {
-    var result: [HexPosition] = []
-    for i in -4...4 {
-        for j in -2...2 {
-            if (i + j) % 2 == 0 && !(abs(i) == 4 && abs(j) == 2) {
-                result.append(HexPosition(column: i, row: j))
-            }
-        }
-    }
-    return result
-}
+
 
 
 
