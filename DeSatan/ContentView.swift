@@ -41,14 +41,24 @@ struct ContentView: View {
             GeometryReader { geometry in
                 let rect = geometry.frame(in: .global)
                 let gridLayoutEngine = GridLayoutEngine(positions: coreGameModel.hexPositions, width: rect.width, height: rect.height)
+
+                let vertexGeometry = VertexGeometry(hexCenters: gridLayoutEngine.hexCenters, hexSize: gridLayoutEngine.hexSize, hexSpacing: gridLayoutEngine.spacing)
+
                 let centerToPosition = Array(zip(gridLayoutEngine.hexCenters, coreGameModel.hexPositions).enumerated())
                 ForEach(centerToPosition, id: \.0) { indexedElement in
-                    let (index, (center, position)) = indexedElement
+                    let (_, (center, position)) = indexedElement
                     let hexGeometry = HexagonGeometry(size: gridLayoutEngine.hexSize, center: center)
                     HexagonShape(adjustment: gridLayoutEngine.hexCornerRatio, size: gridLayoutEngine.hexSize, center: center, vertices: hexGeometry.vertices)
                         .onTapGesture {
                             print(position)
                         }
+                }
+
+                ForEach(vertexGeometry.allVertices, id: \.self) { vertex in
+                    Circle()
+                        .frame(width: 10, height: 10)
+                        .position(vertex)
+                        .foregroundStyle(.red)
                 }
             }
         }
