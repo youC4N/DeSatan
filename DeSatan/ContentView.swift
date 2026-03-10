@@ -76,11 +76,13 @@ struct ContentView: View {
                         .position(vertex)
                 }
 
+                let rectOrigin = rect.height/2 - (4*(gridLayoutEngine.hexSize+gridLayoutEngine.spacing)+10/2)
+
                 Color.clear
-                    .contentShape(Rectangle())
+                    .contentShape(Rectangle().size(width: rect.width, height: gridHeight(height: rect.height, hexSize: gridLayoutEngine.hexSize, spacing: gridLayoutEngine.spacing, vertexSize: 8)).offset(x: 0, y: rectOrigin))
                     .onTapGesture { location in
                         if let vertex = vertexGeometry.allVertices.first(where: {
-                            distance($0, location) < 15
+                            distance($0, location) < 10
                         }) {
                             print("Tapped vertex at: \(vertex)")
                         }
@@ -106,6 +108,9 @@ struct ContentView: View {
             }
         }
         return nil
+    }
+    private func gridHeight(height: CGFloat, hexSize: CGFloat, spacing: Double, vertexSize: Double) -> CGFloat {
+        height - (hexSize+spacing)*8 + 20
     }
 
 }
