@@ -26,7 +26,7 @@ struct GridLayoutEngine {
         self.spacing = spacing
         let hexSize = Self.getHexSize(for: width, with: spacing)
         self.hexSize = hexSize
-        self.hexCenters = positions.map{ Self.getHexCenter(for: hexSize, at: $0) + CGPoint(x: width/2, y: height/2) }
+        self.hexCenters = positions.map{ Self.getHexCenter(for: hexSize, at: $0, with: spacing) + CGPoint(x: width/2, y: height/2) }
     }
 }
 
@@ -34,11 +34,11 @@ struct GridLayoutEngine {
 private extension GridLayoutEngine {
     static func getHexSize(for width: CGFloat, with spacing: Double) -> CGFloat { (width - 10*spacing)/(5*sqrt(3)) }
 
-    static func getHexCenter(for size: CGFloat, at position: HexPosition) -> CGPoint {
+    static func getHexCenter(for size: CGFloat, at position: HexPosition, with spacing: Double) -> CGPoint {
         let x = sqrt(3)/2  * Double(position.column)
         let y = 3.0/2 * Double(position.row)
 
-        return CGPoint(x: (size+1) * x, y: (size+1) * y)
+        return CGPoint(x: (size+spacing) * x, y: (size+spacing) * y)
     }
 
 }
