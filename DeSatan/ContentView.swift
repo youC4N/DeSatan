@@ -7,46 +7,32 @@
 
 import SwiftUI
 
-enum Direction: CaseIterable {
-    case east
-    case west
-    case northWest
-    case northEast
-    case southWest
-    case southEast
 
-    var vector: (x: Int, y: Int) {
-        switch self {
-        case .northEast: return (x: 1, y: -1)
-        case .east: return (x: 2, y: 0)
-        case .southEast: return (x: 1, y: 1)
-        case .southWest: return (x: -1, y: 1)
-        case .west: return (x: -2, y: 0)
-        case .northWest: return (x: -1, y: -1)
-        }
-    }
+
+struct GameVertex: Hashable {
+    var neighborHexagons = [HexPosition?]()
 }
 
-struct HexPosition: Hashable {
-    let column: Int
-    let row: Int
+struct HexagonGame {
+    let position: HexPosition
+    let neighbors: [HexPosition]
+    let vertices: [CGPoint]
 }
-
 
 
 struct ContentView: View {
-    let coreGameModel = CoreGame()
+    let coreGameModel: CoreGame
     var body: some View {
         GeometryReader { geometry in
-            GridView(rect: geometry.frame(in: .local), hexPositions: coreGameModel.hexPositions)
+            GridView(rect: geometry.frame(in: .local),
+                     hexPositions: hexPositions)
         }
     }
+    init() {
+        let coreGameModel = CoreGame()
+    }
+
 }
-
-
-
-
-
 
 #Preview {
     ContentView()
