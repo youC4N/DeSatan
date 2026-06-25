@@ -19,19 +19,16 @@ struct HexagonGame {
     let vertices: [CGPoint]
 }
 
-
 struct ContentView: View {
     let coreGameModel: CoreGame
     var body: some View {
         GeometryReader { geometry in
-            GridView(rect: geometry.frame(in: .local),
-                     hexPositions: hexPositions)
+            GridView(rect: geometry.frame(in: .local), gridViewModel: GridViewModel(coreGame: coreGameModel))
         }
     }
     init() {
-        let coreGameModel = CoreGame()
+        coreGameModel = CoreGame()
     }
-
 }
 
 #Preview {

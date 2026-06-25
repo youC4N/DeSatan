@@ -33,11 +33,10 @@ enum Direction: CaseIterable {
 }
 
 
-
 struct Hexagon {
     let position: HexPosition
 
-    func getNeighbor(direction: Direction, position: HexPosition) -> HexPosition {
+    func getNeighborPosition(direction: Direction) -> HexPosition {
         position + direction.vector
     }
 

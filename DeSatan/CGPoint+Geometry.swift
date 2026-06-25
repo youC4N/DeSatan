@@ -11,7 +11,7 @@ extension CGPoint {
     static func hexagonVertex(for center: CGPoint, with size: CGFloat, at i: Int) -> CGPoint {
         let angle = Double(60 * i - 30) * .pi/180
         return CGPoint(
-            x: center.x + size*_math.cos(angle),
+            x: center.x + size*cos(angle),
             y: center.y + size*sin(angle)
         )
     }
