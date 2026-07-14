@@ -7,18 +7,18 @@
 
 import Foundation
 
-struct HexPosition: Hashable {
+struct HexPosition: Hashable, Equatable {
     let column: Int
     let row: Int
 }
 
 enum Direction: CaseIterable {
     case east
+    case southEast
+    case southWest
     case west
     case northWest
     case northEast
-    case southWest
-    case southEast
 
     var vector: (x: Int, y: Int) {
         switch self {
@@ -40,7 +40,7 @@ struct Hexagon {
         position + direction.vector
     }
 
-    func getAllNeighbors(_ position: HexPosition) -> [HexPosition] {
+    func getAllNeighbors() -> [HexPosition] {
         Direction.allCases.map { dir in
             position+dir.vector
         }

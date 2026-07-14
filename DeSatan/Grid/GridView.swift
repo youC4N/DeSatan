@@ -17,6 +17,7 @@ struct GridView: View {
         self.gridViewModel = gridViewModel
         self.gridLayoutEngine = GridLayoutEngine(
             hexagon: gridViewModel.hexagons,
+            vertices: gridViewModel.vertices,
             width: rect.width,
             height: rect.height
         )
@@ -26,12 +27,12 @@ struct GridView: View {
             ForEach(0..<gridLayoutEngine.hexShapes.count, id: \.self) { i in
                 gridLayoutEngine.hexShapes[i]
             }
-//            ForEach(gridLayoutEngine.allVertices, id: \.self) { vertex in
-//                Circle()
-//                    .fill(Color.red)
-//                    .frame(width: 8, height: 8)
-//                    .position(vertex)
-//            }
+            ForEach(gridLayoutEngine.allVertices, id: \.self) { vertex in
+                Circle()
+                    .fill(Color.red)
+                    .frame(width: 8, height: 8)
+                    .position(vertex)
+            }
 
             Color.clear
                 .contentShape(

@@ -10,8 +10,10 @@ import Foundation
 @Observable
 class GridViewModel {
     let hexagons: [Hexagon]
+    let vertices: [VertexPosition]
 
     init(coreGame: CoreGame) {
         self.hexagons = coreGame.getHexPosition()
+        self.vertices = coreGame.vertices
     }
 }

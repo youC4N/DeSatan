@@ -28,6 +28,7 @@ struct ContentView: View {
     }
     init() {
         coreGameModel = CoreGame()
+        print(coreGameModel.vertices)
     }
 }
 

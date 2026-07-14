@@ -6,6 +6,10 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		E6098A242FF2A70600B9C83D /* Algorithms in Frameworks */ = {isa = PBXBuildFile; productRef = E6098A232FF2A70600B9C83D /* Algorithms */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
 		E630D9572F4113BC00C8FA15 /* DeSatan.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DeSatan.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -23,6 +27,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E6098A242FF2A70600B9C83D /* Algorithms in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -65,6 +70,7 @@
 			);
 			name = DeSatan;
 			packageProductDependencies = (
+				E6098A232FF2A70600B9C83D /* Algorithms */,
 			);
 			productName = DeSatan;
 			productReference = E630D9572F4113BC00C8FA15 /* DeSatan.app */;
@@ -94,6 +100,9 @@
 			);
 			mainGroup = E630D94E2F4113BC00C8FA15;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				E6098A222FF2A70600B9C83D /* XCRemoteSwiftPackageReference "swift-algorithms" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = E630D9582F4113BC00C8FA15 /* Products */;
 			projectDirPath = "";
@@ -322,6 +331,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		E6098A222FF2A70600B9C83D /* XCRemoteSwiftPackageReference "swift-algorithms" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/apple/swift-algorithms.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.2.1;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		E6098A232FF2A70600B9C83D /* Algorithms */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = E6098A222FF2A70600B9C83D /* XCRemoteSwiftPackageReference "swift-algorithms" */;
+			productName = Algorithms;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = E630D94F2F4113BC00C8FA15 /* Project object */;
 }
