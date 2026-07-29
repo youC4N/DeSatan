@@ -43,14 +43,11 @@ struct CoreGame {
 
     private func getVertices(for hex: Hexagon) -> [VertexPosition] {
         let allNeighbors = hex.getAllNeighbors()
-//        print("\nNeighbors: \(allNeighbors)\n")
         let pairs = allNeighbors.indices.map { i in
             (allNeighbors[i], allNeighbors[(i+1)%allNeighbors.count])
         }
         var result = [VertexPosition]()
-//        print("\n pairs:")
         for (first, second) in pairs {
-//            print("current: \(hex.position) First: \(first.column), \(first.row); Second: \(second.column), \(second.row)")
             if positions.contains(first) && positions.contains(second) {
                 result.append(VertexPosition(drawingNeighbor: .three(hex.position, first, second), neighbors: [hex.position, first, second]))
             } else if positions.contains(first) {

@@ -9,15 +9,7 @@ import Foundation
 import Algorithms
 
 
-struct VertexPosition: Hashable, Equatable {
-    static func == (lhs: VertexPosition, rhs: VertexPosition) -> Bool {
-        if lhs.neighbors == rhs.neighbors {
-            return true
-        } else {
-            return false
-        }
-    }
-    
+struct VertexPosition {
     enum DrawingNeighbor {
         case one(HexPosition)
         case two(HexPosition, HexPosition)
@@ -25,10 +17,18 @@ struct VertexPosition: Hashable, Equatable {
     }
     let drawingNeighbor: DrawingNeighbor
     let neighbors: Set<HexPosition>
+}
+
+extension VertexPosition: Hashable {
+    static func == (lhs: VertexPosition, rhs: VertexPosition) -> Bool {
+        if lhs.neighbors == rhs.neighbors {
+            return true
+        } else {
+            return false
+        }
+    }
 
     func hash(into hasher: inout Hasher) {
         hasher.combine(neighbors)
     }
 }
-
-
