@@ -13,7 +13,7 @@ class GridViewModel {
     let vertices: [VertexPosition]
 
     init(coreGame: CoreGame) {
-        self.hexagons = coreGame.getHexPosition()
+        self.hexagons = coreGame.hexagons
         self.vertices = coreGame.vertices
     }
 }

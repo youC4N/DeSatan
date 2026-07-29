@@ -10,6 +10,10 @@ import Foundation
 struct HexPosition: Hashable, Equatable {
     let column: Int
     let row: Int
+
+    func isDrawable() -> Bool {
+        return  (-4...4 ~= self.column && -2...2 ~= self.row && (self.column + self.row) % 2 == 0 && !(abs(self.column) == 4 && abs(self.row) == 2)) ? true : false
+    }
 }
 
 enum Direction: CaseIterable {

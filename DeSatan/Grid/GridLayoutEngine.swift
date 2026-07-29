@@ -17,7 +17,7 @@ struct GridLayoutEngine {
     }
     /// The fraction of each side length to round, from 0 (sharp corners) to 0.5 (maximum rounding).
     private let hexagons: [Hexagon]
-    private let vertices: [VertexPosition]
+     let vertices: [VertexPosition]
     private let hexCornerRatio: CGFloat
     private let width: CGFloat
     private var drawingHexSize: CGFloat { hexSize + spacing }
@@ -47,34 +47,7 @@ struct GridLayoutEngine {
     var allVertices: [CGPoint] {
         var result: [CGPoint] = []
         for vertex in vertices {
-            let neighbors = Array(vertex.neighbors)
-
-            let xFirstCenter = getHexCenter(for: neighbors[0]).x
-            let yFirstCenter = getHexCenter(for: neighbors[0]).y
-
-            let xSecondCenter = getHexCenter(for: neighbors[1]).x
-            let ySecondCenter = getHexCenter(for: neighbors[1]).y
-
-            let xThirdCenter = getHexCenter(for: neighbors[2]).x
-            let yThirdCenter = getHexCenter(for: neighbors[2]).y
-
-            /// x1^2 - x2^2 + y1^2 - y2^2
-            let a = pow(xFirstCenter, 2) - pow(xSecondCenter, 2) + pow(yFirstCenter, 2) - pow(ySecondCenter, 2)
-            /// x1^2 - x3^2 + y1^2-y3^2
-            let b = pow(xFirstCenter, 2) - pow(xThirdCenter, 2) + pow(yFirstCenter, 2) - pow(yThirdCenter, 2)
-            /// numerator
-            let c = ((a*(yFirstCenter-yThirdCenter)) - (b*(yFirstCenter - ySecondCenter)))
-            let d = (xFirstCenter - xSecondCenter)*(yFirstCenter - yThirdCenter)
-            let e = (xFirstCenter - xThirdCenter)*(yFirstCenter - ySecondCenter)
-            let xVertex =  c/(2*(d - e))
-
-            let a1 = pow(xFirstCenter, 2) - pow(xThirdCenter, 2) + pow(yFirstCenter, 2) - pow(yThirdCenter, 2)
-            let b1 = pow(xFirstCenter, 2) - pow(xSecondCenter, 2) + pow(yFirstCenter, 2) - pow(ySecondCenter, 2)
-            let c1 = ((xFirstCenter - xSecondCenter)*a1) - ((xFirstCenter - xThirdCenter)*(b1))
-            let d1 = (xFirstCenter - xSecondCenter)*(yFirstCenter - yThirdCenter)
-            let e1 = (xFirstCenter - xThirdCenter)*(yFirstCenter - ySecondCenter)
-            let yVertex = (c1)/(2*(d1 - e1))
-            result.append(CGPoint(x: xVertex, y: yVertex))
+            result.append(vertexCoordinates(for: vertex))
         }
         return result 
     }
@@ -83,6 +56,37 @@ struct GridLayoutEngine {
         hexCenters.map { center in
             HexagonShape(adjustment: hexCornerRatio, size: hexSize, center: center, vertices: getVerticesForHex(at: center))
         }
+    }
+
+    func vertexCoordinates(for vertexPosition: VertexPosition) -> CGPoint {
+        let neighbors = Array(vertexPosition.hexNeighbors)
+
+        let xFirstCenter = getHexCenter(for: neighbors[0]).x
+        let yFirstCenter = getHexCenter(for: neighbors[0]).y
+
+        let xSecondCenter = getHexCenter(for: neighbors[1]).x
+        let ySecondCenter = getHexCenter(for: neighbors[1]).y
+
+        let xThirdCenter = getHexCenter(for: neighbors[2]).x
+        let yThirdCenter = getHexCenter(for: neighbors[2]).y
+
+        /// x1^2 - x2^2 + y1^2 - y2^2
+        let a = pow(xFirstCenter, 2) - pow(xSecondCenter, 2) + pow(yFirstCenter, 2) - pow(ySecondCenter, 2)
+        /// x1^2 - x3^2 + y1^2-y3^2
+        let b = pow(xFirstCenter, 2) - pow(xThirdCenter, 2) + pow(yFirstCenter, 2) - pow(yThirdCenter, 2)
+        /// numerator
+        let c = ((a*(yFirstCenter-yThirdCenter)) - (b*(yFirstCenter - ySecondCenter)))
+        let d = (xFirstCenter - xSecondCenter)*(yFirstCenter - yThirdCenter)
+        let e = (xFirstCenter - xThirdCenter)*(yFirstCenter - ySecondCenter)
+        let xVertex =  c/(2*(d - e))
+
+        let a1 = pow(xFirstCenter, 2) - pow(xThirdCenter, 2) + pow(yFirstCenter, 2) - pow(yThirdCenter, 2)
+        let b1 = pow(xFirstCenter, 2) - pow(xSecondCenter, 2) + pow(yFirstCenter, 2) - pow(ySecondCenter, 2)
+        let c1 = ((xFirstCenter - xSecondCenter)*a1) - ((xFirstCenter - xThirdCenter)*(b1))
+        let d1 = (xFirstCenter - xSecondCenter)*(yFirstCenter - yThirdCenter)
+        let e1 = (xFirstCenter - xThirdCenter)*(yFirstCenter - ySecondCenter)
+        let yVertex = (c1)/(2*(d1 - e1))
+        return CGPoint(x: xVertex, y: yVertex)
     }
 
     init(hexagon: [Hexagon], vertices: [VertexPosition], width: CGFloat, height: CGFloat, hexCornerRatio: CGFloat = 0.1, spacing: Double = 2) {
