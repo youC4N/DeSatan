@@ -34,6 +34,7 @@ struct HNeighborsLayout {
 enum VertexNeighborsLayout {
     case yLayout(YNeighborsLayout)
     case hLayout(HNeighborsLayout)
+
     var onTheField: Bool {
         if vertices.filter({ $0.isDrawable() }).isEmpty {
             return false
@@ -53,7 +54,6 @@ enum VertexNeighborsLayout {
 
 struct VertexPosition {
     let vertexLayout: VertexNeighborsLayout
-
 
     var allNeighbors: [VertexPosition] {
         var neighbors: [VertexPosition] = []
@@ -77,7 +77,23 @@ struct VertexPosition {
         }
         return neighbors
     }
+}
 
+extension VertexPosition: Hashable {
+    static func == (lhs: VertexPosition, rhs: VertexPosition) -> Bool {
+        if lhs.vertexLayout.vertices == rhs.vertexLayout.vertices {
+            return true
+        } else {
+            return false
+        }
+    }
+
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(vertexLayout.vertices)
+    }
+}
+
+private extension VertexPosition {
     func getYDirectionNeighbor(_ vertex: YNeighborsLayout, in direction: YNeighborDirection) -> HNeighborsLayout {
         switch direction {
         case .northEast:
@@ -104,19 +120,5 @@ struct VertexPosition {
             let southWest = HexPosition(column: vertex.northEast.column - 3, row: vertex.northEast.row + 1)
             return YNeighborsLayout(north: vertex.northWest, southEast: vertex.south, southWest: southWest)
         }
-    }
-}
-
-extension VertexPosition: Hashable {
-    static func == (lhs: VertexPosition, rhs: VertexPosition) -> Bool {
-        if lhs.vertexLayout.vertices == rhs.vertexLayout.vertices {
-            return true
-        } else {
-            return false
-        }
-    }
-
-    func hash(into hasher: inout Hasher) {
-        hasher.combine(vertexLayout.vertices)
     }
 }

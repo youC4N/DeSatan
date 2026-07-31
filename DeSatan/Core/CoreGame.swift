@@ -26,9 +26,24 @@ struct CoreGame {
         let allVertices = Array(NSOrderedSet(array: verticesForEachHex.flatMap(\.self))) as! [VertexPosition]
         return allVertices
     }
+
+    var roads: [Road] {
+        let roadsForEachVertex = vertices.map { vertex in
+            getRoads(for: vertex) }
+        let allRoads = Array(Set(roadsForEachVertex.flatMap(\.self)))
+        return allRoads
+    }
 }
 
 private extension CoreGame {
+    func getRoads(for vertex: VertexPosition) -> [Road] {
+        var result: [Road] = []
+        for neighborVertex in vertex.allNeighbors {
+            result.append(Road(roadPosition: [vertex, neighborVertex]))
+        }
+        return result
+    }
+
     func getVertices(for hex: Hexagon) -> [VertexPosition] {
         let allNeighbors = hex.getAllNeighbors()
         let pairs = allNeighbors.indices.map { i in

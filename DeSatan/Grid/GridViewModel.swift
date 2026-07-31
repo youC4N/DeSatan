@@ -11,9 +11,11 @@ import Foundation
 class GridViewModel {
     let hexagons: [Hexagon]
     let vertices: [VertexPosition]
+    let roads: [Road]
 
     init(coreGame: CoreGame) {
         self.hexagons = coreGame.hexagons
         self.vertices = coreGame.vertices
+        self.roads = coreGame.roads
     }
 }
