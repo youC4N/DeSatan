@@ -23,8 +23,8 @@ struct CoreGame {
 
     var vertices: [VertexPosition] {
         let verticesForEachHex = hexagons.map{hex in getVertices(for: hex)}
-        let allVertices = Set(verticesForEachHex.flatMap(\.self))
-        return Array(allVertices)
+        let allVertices = Array(NSOrderedSet(array: verticesForEachHex.flatMap(\.self))) as! [VertexPosition]
+        return allVertices
     }
 }
 
@@ -36,60 +36,60 @@ private extension CoreGame {
         }
         var result = [VertexPosition]()
         for (first, second) in pairs {
-            var vertexConnectionType: VertexDirection
+            var vertexConnectionType: VertexNeighborsLayout
             if first.row == hex.position.row {
                 if second.row < first.row {
                     if first.column > hex.position.column {
-                        vertexConnectionType = VertexDirection.yDirection(YVertexDirection(north: second, southEast: first, southWest: hex.position))
+                        vertexConnectionType = VertexNeighborsLayout.yLayout(YNeighborsLayout(north: second, southEast: first, southWest: hex.position))
                     } else {
-                        vertexConnectionType = VertexDirection.yDirection(YVertexDirection(north: second, southEast: hex.position, southWest: first))
+                        vertexConnectionType = VertexNeighborsLayout.yLayout(YNeighborsLayout(north: second, southEast: hex.position, southWest: first))
                     }
                 } else {
                     if first.column > hex.position.column {
-                        vertexConnectionType = VertexDirection.hDirection(HVertexDirection(northWest: hex.position, northEast: first, south: second))
+                        vertexConnectionType = VertexNeighborsLayout.hLayout(HNeighborsLayout(northWest: hex.position, northEast: first, south: second))
                     } else {
-                        vertexConnectionType = VertexDirection.hDirection(HVertexDirection(northWest: first, northEast: hex.position, south: second))
+                        vertexConnectionType = VertexNeighborsLayout.hLayout(HNeighborsLayout(northWest: first, northEast: hex.position, south: second))
                     }
                 }
             } else if first.row == second.row {
                 if hex.position.row < first.row {
                     if first.column > second.column {
-                        vertexConnectionType = VertexDirection.yDirection(YVertexDirection(north: hex.position, southEast: first, southWest: second))
+                        vertexConnectionType = VertexNeighborsLayout.yLayout(YNeighborsLayout(north: hex.position, southEast: first, southWest: second))
                     } else {
-                        vertexConnectionType = VertexDirection.yDirection(YVertexDirection(north: hex.position, southEast: second, southWest: first))
+                        vertexConnectionType = VertexNeighborsLayout.yLayout(YNeighborsLayout(north: hex.position, southEast: second, southWest: first))
                     }
                 } else {
                     if second.column > first.column {
-                        vertexConnectionType = VertexDirection.hDirection(HVertexDirection(northWest: first, northEast: second, south: hex.position))
+                        vertexConnectionType = VertexNeighborsLayout.hLayout(HNeighborsLayout(northWest: first, northEast: second, south: hex.position))
                     } else {
-                        vertexConnectionType = VertexDirection.hDirection(HVertexDirection(northWest: second, northEast: first, south: hex.position))
+                        vertexConnectionType = VertexNeighborsLayout.hLayout(HNeighborsLayout(northWest: second, northEast: first, south: hex.position))
                     }
                 }
             } else {
                 if first.row < second.row {
                     if second.column > hex.position.column {
-                        vertexConnectionType = VertexDirection.yDirection(YVertexDirection(north: first, southEast: second, southWest: hex.position))
+                        vertexConnectionType = VertexNeighborsLayout.yLayout(YNeighborsLayout(north: first, southEast: second, southWest: hex.position))
                     } else {
-                        vertexConnectionType = VertexDirection.yDirection(YVertexDirection(north: first, southEast: hex.position, southWest: second))
+                        vertexConnectionType = VertexNeighborsLayout.yLayout(YNeighborsLayout(north: first, southEast: hex.position, southWest: second))
                     }
                 } else {
                     if second.column > hex.position.column {
-                        vertexConnectionType = VertexDirection.hDirection(HVertexDirection(northWest: hex.position, northEast: second, south: first))
+                        vertexConnectionType = VertexNeighborsLayout.hLayout(HNeighborsLayout(northWest: hex.position, northEast: second, south: first))
                     } else {
-                        vertexConnectionType = VertexDirection.hDirection(HVertexDirection(northWest: second, northEast: hex.position, south: first))
+                        vertexConnectionType = VertexNeighborsLayout.hLayout(HNeighborsLayout(northWest: second, northEast: hex.position, south: first))
                     }
                 }
             }
 
 
             if positions.contains(first) && positions.contains(second) {
-                result.append(VertexPosition(drawingHexNeighbor: .three(hex.position, first, second), hexNeighbors: [hex.position, first, second], vertexConnectionType: vertexConnectionType))
+                result.append(VertexPosition(drawingHexNeighbor: .three(hex.position, first, second), vertexLayout: vertexConnectionType))
             } else if positions.contains(first) {
-                result.append(VertexPosition(drawingHexNeighbor: .two(hex.position, first), hexNeighbors: [hex.position, first, second], vertexConnectionType: vertexConnectionType))
+                result.append(VertexPosition(drawingHexNeighbor: .two(hex.position, first), vertexLayout: vertexConnectionType))
             } else if positions.contains(second) {
-                result.append(VertexPosition(drawingHexNeighbor: .two(hex.position, second), hexNeighbors: [hex.position, first, second], vertexConnectionType: vertexConnectionType))
+                result.append(VertexPosition(drawingHexNeighbor: .two(hex.position, second), vertexLayout: vertexConnectionType))
             } else {
-                result.append(VertexPosition(drawingHexNeighbor: .one(hex.position), hexNeighbors: [hex.position, first, second], vertexConnectionType: vertexConnectionType))
+                result.append(VertexPosition(drawingHexNeighbor: .one(hex.position), vertexLayout: vertexConnectionType))
             }
         }
         return result

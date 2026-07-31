@@ -13,7 +13,7 @@ struct GridView: View {
     let gridViewModel: GridViewModel
     let vertices: [VertexPosition]
 
-    @State private var currentVertexIndex = 0   // <-- new state
+    @State private var currentVertexIndex = 0   
 
     init(rect: CGRect, gridViewModel: GridViewModel) {
         self.rect = rect
