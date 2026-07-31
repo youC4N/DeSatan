@@ -34,6 +34,13 @@ struct HNeighborsLayout {
 enum VertexNeighborsLayout {
     case yLayout(YNeighborsLayout)
     case hLayout(HNeighborsLayout)
+    var onTheField: Bool {
+        if vertices.filter({ $0.isDrawable() }).isEmpty {
+            return false
+        } else {
+            return true
+        }
+    }
     var vertices: [HexPosition]  {
         switch self {
         case .yLayout(let yLayout):
@@ -45,12 +52,6 @@ enum VertexNeighborsLayout {
 }
 
 struct VertexPosition {
-    enum DrawingNeighbor {
-        case one(HexPosition)
-        case two(HexPosition, HexPosition)
-        case three(HexPosition, HexPosition, HexPosition)
-    }
-    let drawingHexNeighbor: DrawingNeighbor
     let vertexLayout: VertexNeighborsLayout
 
 
@@ -60,15 +61,18 @@ struct VertexPosition {
         case .yLayout(let yVertexDirection):
             for direction in YNeighborDirection.allCases {
                 let vertexConnectionType = getYDirectionNeighbor(yVertexDirection, in: direction)
-                guard let drawingNeighbors = drawableNeighbors(firstHex: vertexConnectionType.northEast, secondHex: vertexConnectionType.northWest, thirdHex: vertexConnectionType.south) else { continue }
-                neighbors.append(VertexPosition(drawingHexNeighbor: drawingNeighbors, vertexLayout: VertexNeighborsLayout.hLayout(vertexConnectionType)))
-
+                let vertexLayout = VertexNeighborsLayout.hLayout(vertexConnectionType)
+                if vertexLayout.onTheField {
+                    neighbors.append(VertexPosition(vertexLayout: vertexLayout))
+                }
             }
         case .hLayout(let hVertexDirection):
             for direction in HNeighborDirection.allCases {
                 let vertexConnectionType = getHDirectionNeighbor(hVertexDirection, in: direction)
-                guard let drawingNeighbors = drawableNeighbors(firstHex: vertexConnectionType.north, secondHex: vertexConnectionType.southEast, thirdHex: vertexConnectionType.southWest) else { continue }
-                neighbors.append(VertexPosition(drawingHexNeighbor: drawingNeighbors, vertexLayout: VertexNeighborsLayout.yLayout(vertexConnectionType)))
+                let vertexLayout = VertexNeighborsLayout.yLayout(vertexConnectionType)
+                if vertexLayout.onTheField {
+                    neighbors.append(VertexPosition(vertexLayout: vertexLayout))
+                }
             }
         }
         return neighbors
@@ -101,28 +105,6 @@ struct VertexPosition {
             return YNeighborsLayout(north: vertex.northWest, southEast: vertex.south, southWest: southWest)
         }
     }
-
-    func drawableNeighbors(firstHex: HexPosition, secondHex: HexPosition, thirdHex: HexPosition) -> DrawingNeighbor? {
-        switch (firstHex.isDrawable(), secondHex.isDrawable(), thirdHex.isDrawable()) {
-        case (true, true, true):
-            return DrawingNeighbor.three(firstHex, secondHex, thirdHex)
-        case (true, true, false):
-            return DrawingNeighbor.two(firstHex, secondHex)
-        case (true, false, false):
-            return DrawingNeighbor.one(firstHex)
-        case (false, false, false):
-            return nil
-        case (false, true, true):
-            return DrawingNeighbor.two(secondHex, thirdHex)
-        case (true, false, true):
-            return DrawingNeighbor.two(firstHex, thirdHex)
-        case (false, true, false):
-            return DrawingNeighbor.one(secondHex)
-        case (false, false, true):
-            return DrawingNeighbor.one(thirdHex)
-        }
-    }
-
 }
 
 extension VertexPosition: Hashable {

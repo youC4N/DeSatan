@@ -80,17 +80,7 @@ private extension CoreGame {
                     }
                 }
             }
-
-
-            if positions.contains(first) && positions.contains(second) {
-                result.append(VertexPosition(drawingHexNeighbor: .three(hex.position, first, second), vertexLayout: vertexConnectionType))
-            } else if positions.contains(first) {
-                result.append(VertexPosition(drawingHexNeighbor: .two(hex.position, first), vertexLayout: vertexConnectionType))
-            } else if positions.contains(second) {
-                result.append(VertexPosition(drawingHexNeighbor: .two(hex.position, second), vertexLayout: vertexConnectionType))
-            } else {
-                result.append(VertexPosition(drawingHexNeighbor: .one(hex.position), vertexLayout: vertexConnectionType))
-            }
+            result.append(VertexPosition(vertexLayout: vertexConnectionType))
         }
         return result
     }
