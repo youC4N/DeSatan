@@ -20,15 +20,35 @@ struct HexagonGame {
 }
 
 struct ContentView: View {
-    let coreGameModel: CoreGame
+    @State var gridViewModel: GridViewModel
+
+    init() {
+        self._gridViewModel = State(initialValue: GridViewModel(coreGame: CoreGame()))
+    }
     var body: some View {
         GeometryReader { geometry in
-            GridView(rect: geometry.frame(in: .local), gridViewModel: GridViewModel(coreGame: coreGameModel))
+            VStack{
+                GridView(rect: geometry.frame(in: .local), gridViewModel: gridViewModel)
+                HStack{
+                    Spacer()
+                    Button {
+                        print("Add house tapped")
+                        gridViewModel.refreshPossibleVertices()
+                    } label: {
+                        Text("Add Vertex")
+                    }
+                    Spacer()
+                    Button {
+                        print("Add road tapped")
+                    } label: {
+                        Text("Add Road")
+                    }
+                    Spacer()
+
+                }
+                Spacer()
+            }
         }
-    }
-    init() {
-        coreGameModel = CoreGame()
-        //print(coreGameModel.vertices)
     }
 }
 

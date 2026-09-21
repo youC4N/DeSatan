@@ -12,23 +12,23 @@ struct GridView: View {
         static let roadWidth: CGFloat = 4
     }
     let rect: CGRect
-    let gridLayoutEngine: GridLayoutEngine
     let gridViewModel: GridViewModel
-    let vertices: [VertexPosition]
+    var vertices: [VertexPosition] { gridViewModel.showedVertices }
+    var gridLayoutEngine: GridLayoutEngine {
+        GridLayoutEngine(
+            hexagon: gridViewModel.hexagons,
+            vertices: gridViewModel.showedVertices,
+            roads: gridViewModel.roads,
+            width: rect.width,
+            height: rect.height
+        )
+    }
 
     @State private var currentVertexIndex = 0   
 
     init(rect: CGRect, gridViewModel: GridViewModel) {
         self.rect = rect
         self.gridViewModel = gridViewModel
-        self.gridLayoutEngine = GridLayoutEngine(
-            hexagon: gridViewModel.hexagons,
-            vertices: gridViewModel.vertices,
-            roads: gridViewModel.roads,
-            width: rect.width,
-            height: rect.height
-        )
-        self.vertices = gridLayoutEngine.vertices
     }
 
     var body: some View {
@@ -44,20 +44,31 @@ struct GridView: View {
                 }
                 ForEach(0..<gridLayoutEngine.allRoads.count, id: \.self) {i in
                     gridLayoutEngine.allRoads[i]
-                        .stroke(Color.green, lineWidth: Constans.roadWidth)
+                        .stroke(Color.white, lineWidth: Constans.roadWidth)
                 }
-                 ForEach(gridLayoutEngine.allVertices, id: \.self) { vertex in
+                 ForEach(gridViewModel.possibleVertices, id: \.self) { vertex in
                      Button {
-                         print(vertex.x, vertex.y)
+                         gridViewModel.placeVertex(at: vertex)
+                         gridViewModel.showPossibleVertices.toggle()
                      } label: {
-                         Circle()
-                             .fill(.red)
-                             .frame(width: 8)
+                         if gridViewModel.showPossibleVertices {
+                             Circle()
+                                 .fill(.red)
+                                 .frame(width: 8)
+                         }
                      }
                      .frame(width: 35, height: 35)
                      .contentShape(Circle())
-                     .position(vertex)
+                     .position(gridLayoutEngine.vertexCoordinates(for: vertex))
                  }
+                ForEach(gridViewModel.showedVertices, id: \.self) { vertex in
+                    Circle()
+                        .fill(.blue)
+                        .frame(width: 8)
+                        .frame(width: 35, height: 35)
+                        .contentShape(Circle())
+                        .position(gridLayoutEngine.vertexCoordinates(for: vertex))
+                }
 
 
 //                // Neighbors of the current vertex
@@ -98,5 +109,33 @@ struct GridView: View {
 //            }
 //            .padding()
         }
+    }
+
+    func getVertexPostion(for coordinates: CGPoint) -> VertexPosition? {
+        // WORKITEM: it is not correct convertation to Int
+        let column = (coordinates.x * 2) / sqrt(3)
+        let row = (coordinates.y * 2) / 3
+        let hexPosition = HexPosition(column: Int(column), row: Int(row))
+        let hex = Hexagon(position: hexPosition)
+        let hexagonCenter = gridLayoutEngine.getHexCenter(for: hexPosition)
+
+        let hexVertices = gridLayoutEngine.getVerticesForHex(at: hexagonCenter)
+
+        let distanceToEveryVertex = hexVertices.map{vertex in CGPoint.distance(vertex, coordinates)}
+        let smallestDistance = distanceToEveryVertex.min()!
+        let indexOfClosestVertex = distanceToEveryVertex.firstIndex(of: smallestDistance)!
+        let realVertexCoordinate = hexVertices[indexOfClosestVertex]
+
+        return switch indexOfClosestVertex {
+        case 0:
+            VertexPosition(vertexLayout: VertexNeighborsLayout.hLayout(HNeighborsLayout(northWest: hexPosition, northEast: hex.getNeighborPosition(direction: .east), south: hex.getNeighborPosition(direction: .southEast))))
+        case 1: VertexPosition(vertexLayout: VertexNeighborsLayout.yLayout(YNeighborsLayout(north: hexPosition, southEast: hex.getNeighborPosition(direction: .southEast), southWest: hex.getNeighborPosition(direction: .southWest))))
+        case 2: VertexPosition(vertexLayout: VertexNeighborsLayout.hLayout(HNeighborsLayout(northWest: hex.getNeighborPosition(direction: .west), northEast: hexPosition, south: hex.getNeighborPosition(direction: .southWest))))
+        case 3: VertexPosition(vertexLayout: VertexNeighborsLayout.yLayout(YNeighborsLayout(north: hex.getNeighborPosition(direction: .northWest), southEast: hexPosition, southWest: hex.getNeighborPosition(direction: .west))))
+        case 4: VertexPosition(vertexLayout: VertexNeighborsLayout.hLayout(HNeighborsLayout(northWest: hex.getNeighborPosition(direction: .northWest), northEast: hex.getNeighborPosition(direction: .northEast), south: hexPosition)))
+        case 5: VertexPosition(vertexLayout: VertexNeighborsLayout.yLayout(YNeighborsLayout(north: hex.getNeighborPosition(direction: .northEast), southEast: hex.getNeighborPosition(direction: .east), southWest: hexPosition)))
+        default: nil
+        }
+
     }
 }

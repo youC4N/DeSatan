@@ -21,14 +21,14 @@ struct CoreGame {
         positions.map{ Hexagon(position: $0)}
     }
 
-    var vertices: [VertexPosition] {
+    var allVertices: [VertexPosition] {
         let verticesForEachHex = hexagons.map{hex in getVertices(for: hex)}
         let allVertices = Array(NSOrderedSet(array: verticesForEachHex.flatMap(\.self))) as! [VertexPosition]
         return allVertices
     }
 
     var roads: [Road] {
-        let roadsForEachVertex = vertices.map { vertex in
+        let roadsForEachVertex = allVertices.map { vertex in
             getRoads(for: vertex) }
         let allRoads = Array(Set(roadsForEachVertex.flatMap(\.self)))
         return allRoads

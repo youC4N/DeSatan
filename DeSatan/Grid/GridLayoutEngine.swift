@@ -18,11 +18,11 @@ struct GridLayoutEngine {
     }
     /// The fraction of each side length to round, from 0 (sharp corners) to 0.5 (maximum rounding).
     private let hexagons: [Hexagon]
-     let vertices: [VertexPosition]
+    let vertices: [VertexPosition]
     private let roads: [Road]
     private let hexCornerRatio: CGFloat
-    private let width: CGFloat
-    private var drawingHexSize: CGFloat { hexSize + spacing }
+    let width: CGFloat
+    var drawingHexSize: CGFloat { hexSize + spacing }
     private let spacing: Double
     
     var hexSize: CGFloat {
@@ -77,18 +77,20 @@ struct GridLayoutEngine {
         self.width = width
     }
 
-
-}
-
-
-private extension GridLayoutEngine {
-
-    func roadCoordinates(for roadPosition: Road) -> [CGPoint] {
-        let roadVertices = Array(roadPosition.roadPosition)
-        let firstVertex = vertexCoordinates(for: roadVertices[0])
-        let secondVertex = vertexCoordinates(for: roadVertices[1])
-        return [firstVertex, secondVertex]
+    func getHexCenter(for position: HexPosition) -> CGPoint {
+        let x = Constans.xCenterConstant * Double(position.column)
+        let y = Constans.yCenterConstant * Double(position.row)
+        return CGPoint(x: drawingHexSize * x, y: drawingHexSize * y) + CGPoint(x: width/2, y: width/2)
     }
+
+    func getVerticesForHex(at center: CGPoint) -> [CGPoint] {
+       var result = [CGPoint]()
+        for i in 0..<6 { 
+            result.append(CGPoint.hexagonVertex(for: center, with: hexSize, at: i))
+        }
+        return result
+    }
+
 
     func vertexCoordinates(for vertexPosition: VertexPosition) -> CGPoint {
         let neighbors = vertexPosition.vertexLayout.vertices
@@ -120,19 +122,18 @@ private extension GridLayoutEngine {
         let yVertex = (c1)/(2*(d1 - e1))
         return CGPoint(x: xVertex, y: yVertex)
     }
-    
-    func getVerticesForHex(at center: CGPoint) -> [CGPoint] {
-       var result = [CGPoint]()
-        for i in 0..<6 {
-            result.append(CGPoint.hexagonVertex(for: center, with: hexSize, at: i))
-        }
-        return result
+
+}
+
+
+private extension GridLayoutEngine {
+
+    func roadCoordinates(for roadPosition: Road) -> [CGPoint] {
+        let roadVertices = Array(roadPosition.roadPosition)
+        let firstVertex = vertexCoordinates(for: roadVertices[0])
+        let secondVertex = vertexCoordinates(for: roadVertices[1])
+        return [firstVertex, secondVertex]
     }
 
-    func getHexCenter(for position: HexPosition) -> CGPoint {
-        let x = Constans.xCenterConstant * Double(position.column)
-        let y = Constans.yCenterConstant * Double(position.row)
-        return CGPoint(x: drawingHexSize * x, y: drawingHexSize * y) + CGPoint(x: width/2, y: width/2)
 
-    }
 }
