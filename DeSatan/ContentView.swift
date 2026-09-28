@@ -40,10 +40,16 @@ struct ContentView: View {
                     Spacer()
                     Button {
                         print("Add road tapped")
+                        gridViewModel.refreshPossibleRoads()
                     } label: {
                         Text("Add Road")
                     }
                     Spacer()
+                    Button {
+                        gridViewModel.removeAllRoads()
+                    } label: {
+                        Text("Delete All Roads")
+                    }
 
                 }
                 Spacer()

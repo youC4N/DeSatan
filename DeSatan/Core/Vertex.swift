@@ -93,7 +93,7 @@ extension VertexPosition: Hashable {
     }
 }
 
-private extension VertexPosition {
+extension VertexPosition {
     func getYDirectionNeighbor(_ vertex: YNeighborsLayout, in direction: YNeighborDirection) -> HNeighborsLayout {
         switch direction {
         case .northEast:

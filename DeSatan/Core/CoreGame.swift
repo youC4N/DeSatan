@@ -27,10 +27,10 @@ struct CoreGame {
         return allVertices
     }
 
-    var roads: [Road] {
+    var allRoads: [Road] {
         let roadsForEachVertex = allVertices.map { vertex in
             getRoads(for: vertex) }
-        let allRoads = Array(Set(roadsForEachVertex.flatMap(\.self)))
+        let allRoads = Array(Set(roadsForEachVertex.flatMap { $0 }))
         return allRoads
     }
 }
@@ -39,7 +39,19 @@ private extension CoreGame {
     func getRoads(for vertex: VertexPosition) -> [Road] {
         var result: [Road] = []
         for neighborVertex in vertex.allNeighbors {
-            result.append(Road(roadPosition: [vertex, neighborVertex]))
+            switch (vertex.vertexLayout, neighborVertex.vertexLayout){
+            case (.yLayout(let vertexYLayout), .hLayout(let vertexHLayout)), (.hLayout(let vertexHLayout), .yLayout(let vertexYLayout)):
+                if vertexYLayout.north.row < vertexHLayout.northEast.row {
+                    let correctOrder = [vertex, neighborVertex]
+                    let road = Road(roadPosition: correctOrder)
+                    result.append(road)
+                } else {
+                    let correctOrder = [neighborVertex, vertex]
+                    let road = Road(roadPosition: correctOrder)
+                    result.append(road)
+                }
+            default: break
+            }
         }
         return result
     }

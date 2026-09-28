@@ -11,15 +11,16 @@ import Foundation
 class GridViewModel {
     let coreGame: CoreGame
     let hexagons: [Hexagon]
-    let roads: [Road]
     var possibleVertices: [VertexPosition] = []
     var showedVertices: [VertexPosition] = []
+    var possibleRoads: [Road] = []
+    var showedRoads: [Road] = []
     var showPossibleVertices: Bool = false
+    var showPossibleRoads: Bool = false
 
     init(coreGame: CoreGame) {
         self.coreGame = coreGame
         self.hexagons = coreGame.hexagons
-        self.roads = coreGame.roads
     }
 
     func refreshPossibleVertices() {
@@ -38,6 +39,28 @@ class GridViewModel {
         guard possibleVertices.contains(position) else { return }
         showedVertices.append(position)
         possibleVertices.removeAll { $0 == position }
+    }
+
+    func refreshPossibleRoads() {
+        if showedRoads.isEmpty {
+            possibleRoads = coreGame.allRoads
+        } else {
+            possibleRoads = Array(Set(showedRoads.flatMap { road in
+                road.allNeighbors
+            }))
+        }
+        showPossibleRoads.toggle()
+    }
+
+    func placeRoad(at position: Road) {
+        guard possibleRoads.contains(position) else { return }
+        showedRoads.append(position)
+        possibleRoads.removeAll{$0 == position}
+    }
+
+    func removeAllRoads() {
+        possibleRoads = []
+        showedRoads = []
     }
 
 

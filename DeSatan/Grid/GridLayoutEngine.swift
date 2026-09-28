@@ -17,12 +17,12 @@ struct GridLayoutEngine {
         static let yCenterConstant: Double = 3.0/2
     }
     /// The fraction of each side length to round, from 0 (sharp corners) to 0.5 (maximum rounding).
-    private let hexagons: [Hexagon]
     let vertices: [VertexPosition]
-    private let roads: [Road]
-    private let hexCornerRatio: CGFloat
     let width: CGFloat
     var drawingHexSize: CGFloat { hexSize + spacing }
+
+    private let hexCornerRatio: CGFloat
+    private let hexagons: [Hexagon]
     private let spacing: Double
     
     var hexSize: CGFloat {
@@ -46,6 +46,7 @@ struct GridLayoutEngine {
             return CGPoint(x: drawingHexSize * x, y: drawingHexSize * y) + CGPoint(x: width/2, y: width/2)
         }
     }
+
     var allVertices: [CGPoint] {
         var result: [CGPoint] = []
         for vertex in vertices {
@@ -56,22 +57,18 @@ struct GridLayoutEngine {
 
     var hexShapes: [HexagonShape] {
         hexCenters.map { center in
-            HexagonShape(adjustment: hexCornerRatio, size: hexSize, center: center, vertices: getVerticesForHex(at: center))
+            let vertices = getVerticesForHex(at: center)
+            return HexagonShape(adjustment: hexCornerRatio,
+                                size: hexSize,
+                                center: center,
+                                vertices: vertices)
         }
     }
 
-    var allRoads: [RoadShape] {
-        roads.map{ road in
-            RoadShape(vertices: roadCoordinates(for: road))
-        }
-    }
 
-
-
-    init(hexagon: [Hexagon], vertices: [VertexPosition], roads: [Road], width: CGFloat, height: CGFloat, hexCornerRatio: CGFloat = 0.1, spacing: Double = 2) {
+    init(hexagon: [Hexagon], vertices: [VertexPosition], width: CGFloat, height: CGFloat, hexCornerRatio: CGFloat = 0.1, spacing: Double = 2) {
         self.hexagons = hexagon
         self.vertices = vertices
-        self.roads = roads
         self.hexCornerRatio = hexCornerRatio
         self.spacing = spacing
         self.width = width
@@ -121,6 +118,10 @@ struct GridLayoutEngine {
         let e1 = (xFirstCenter - xThirdCenter)*(yFirstCenter - ySecondCenter)
         let yVertex = (c1)/(2*(d1 - e1))
         return CGPoint(x: xVertex, y: yVertex)
+    }
+
+    func roadShape(for road: Road) -> RoadShape {
+        RoadShape(vertices: roadCoordinates(for: road))
     }
 
 }
