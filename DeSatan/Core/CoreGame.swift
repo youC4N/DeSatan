@@ -39,19 +39,8 @@ private extension CoreGame {
     func getRoads(for vertex: VertexPosition) -> [Road] {
         var result: [Road] = []
         for neighborVertex in vertex.allNeighbors {
-            switch (vertex.vertexLayout, neighborVertex.vertexLayout){
-            case (.yLayout(let vertexYLayout), .hLayout(let vertexHLayout)), (.hLayout(let vertexHLayout), .yLayout(let vertexYLayout)):
-                if vertexYLayout.north.row < vertexHLayout.northEast.row {
-                    let correctOrder = [vertex, neighborVertex]
-                    let road = Road(roadPosition: correctOrder)
-                    result.append(road)
-                } else {
-                    let correctOrder = [neighborVertex, vertex]
-                    let road = Road(roadPosition: correctOrder)
-                    result.append(road)
-                }
-            default: break
-            }
+            let road = Road(roadPosition: [vertex, neighborVertex])
+            result.append(road)
         }
         return result
     }

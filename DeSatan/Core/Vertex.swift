@@ -8,6 +8,10 @@
 import Foundation
 import Algorithms
 
+enum NeighborDirection {
+    case yNeighbor(YNeighborDirection)
+    case hNeighbor(HNeighborDirection)
+}
 enum YNeighborDirection: CaseIterable {
     case northWest
     case northEast
@@ -34,6 +38,19 @@ struct HNeighborsLayout {
 enum VertexNeighborsLayout {
     case yLayout(YNeighborsLayout)
     case hLayout(HNeighborsLayout)
+}
+
+struct VertexPosition {
+    let vertexLayout: VertexNeighborsLayout
+
+    var vertices: [HexPosition] {
+        switch vertexLayout {
+        case .yLayout(let yLayout):
+            return [yLayout.north, yLayout.southEast, yLayout.southWest]
+        case .hLayout(let hLayout):
+            return [hLayout.northEast, hLayout.south, hLayout.northWest]
+        }
+    }
 
     var onTheField: Bool {
         if vertices.filter({ $0.isDrawable() }).isEmpty {
@@ -42,18 +59,6 @@ enum VertexNeighborsLayout {
             return true
         }
     }
-    var vertices: [HexPosition]  {
-        switch self {
-        case .yLayout(let yLayout):
-            return [yLayout.north, yLayout.southEast, yLayout.southWest]
-        case .hLayout(let hLayout):
-            return [hLayout.northEast, hLayout.south, hLayout.northWest]
-        }
-    }
-}
-
-struct VertexPosition {
-    let vertexLayout: VertexNeighborsLayout
 
     var allNeighbors: [VertexPosition] {
         var neighbors: [VertexPosition] = []
@@ -62,26 +67,50 @@ struct VertexPosition {
             for direction in YNeighborDirection.allCases {
                 let vertexConnectionType = getYDirectionNeighbor(yVertexDirection, in: direction)
                 let vertexLayout = VertexNeighborsLayout.hLayout(vertexConnectionType)
-                if vertexLayout.onTheField {
-                    neighbors.append(VertexPosition(vertexLayout: vertexLayout))
+                let vertex = VertexPosition(vertexLayout: vertexLayout)
+                if vertex.onTheField {
+                    neighbors.append(vertex)
                 }
             }
         case .hLayout(let hVertexDirection):
             for direction in HNeighborDirection.allCases {
                 let vertexConnectionType = getHDirectionNeighbor(hVertexDirection, in: direction)
                 let vertexLayout = VertexNeighborsLayout.yLayout(vertexConnectionType)
-                if vertexLayout.onTheField {
-                    neighbors.append(VertexPosition(vertexLayout: vertexLayout))
+                let vertex = VertexPosition(vertexLayout: vertexLayout)
+                if vertex.onTheField {
+                    neighbors.append(vertex)
                 }
             }
         }
         return neighbors
     }
+
+    func connectionDirection(_ vertex: VertexPosition) -> NeighborDirection? {
+        switch vertexLayout {
+        case .yLayout(let yNeighborsLayout):
+            for direction in YNeighborDirection.allCases {
+                let neighborHLayout = getYDirectionNeighbor(yNeighborsLayout, in: direction)
+                let neighborVertex = VertexPosition(vertexLayout: .hLayout(neighborHLayout))
+                if neighborVertex == vertex && vertex.onTheField {
+                    return .yNeighbor(direction)
+                }
+            }
+        case .hLayout(let hNeighborsLayout):
+            for direction in HNeighborDirection.allCases {
+                let neighborYLayout = getHDirectionNeighbor(hNeighborsLayout, in: direction)
+                let neighborVertex = VertexPosition(vertexLayout: .yLayout(neighborYLayout))
+                if neighborVertex == vertex && vertex.onTheField {
+                    return .hNeighbor(direction)
+                }
+            }
+        }
+        return nil
+    }
 }
 
 extension VertexPosition: Hashable {
     static func == (lhs: VertexPosition, rhs: VertexPosition) -> Bool {
-        if lhs.vertexLayout.vertices == rhs.vertexLayout.vertices {
+        if lhs.vertices == rhs.vertices {
             return true
         } else {
             return false
@@ -89,7 +118,7 @@ extension VertexPosition: Hashable {
     }
 
     func hash(into hasher: inout Hasher) {
-        hasher.combine(vertexLayout.vertices)
+        hasher.combine(vertices)
     }
 }
 

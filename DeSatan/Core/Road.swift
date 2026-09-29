@@ -7,101 +7,118 @@
 
 import Foundation
 
-enum RoadConnectionDirection {
-    case southEast
-    case south
-    case southWest
-}
 
 struct Road: Hashable {
-    let roadPosition: [VertexPosition]
-
-    private var connectionDirection: RoadConnectionDirection? {
-        let upperVertex = roadPosition[0]
-        let lowerVertex = roadPosition[1]
-
-        switch (upperVertex.vertexLayout, lowerVertex.vertexLayout) {
-        case (.yLayout, .hLayout):
-            return .south
-        case (.hLayout(let hLayout), .yLayout(let yLayout)):
-            if hLayout.south == yLayout.southEast {
-                return .southWest
-            } else {
-                return .southEast
-            }
-        default: return nil
-        }
-    }
+    let roadPosition: Set<VertexPosition>
 
     var allNeighbors: [Road] {
-        var neighbors = [Road]()
+        let roadVertices = Array(roadPosition)
+        let firstVertex = roadVertices[0]
+        let secondVertex = roadVertices[1]
+        guard let firstConnectionDirection = firstVertex.connectionDirection(secondVertex),
+              let secondConnectionDirection = secondVertex.connectionDirection(firstVertex) else { fatalError() }
+        let firstVertexRoads = foo(direction: firstConnectionDirection, vertex: firstVertex)
+        let secondVertexRoads = foo(direction: secondConnectionDirection, vertex: secondVertex)
+        return firstVertexRoads + secondVertexRoads
+    }
 
-        let upperVertex = roadPosition[0]
-        let lowerVertex = roadPosition[1]
-
-        switch upperVertex.vertexLayout {
+    func foo(direction: NeighborDirection, vertex: VertexPosition) -> [Road] {
+        var result = [Road]()
+        let layout = vertex.vertexLayout
+        switch layout {
         case .hLayout(let hLayout):
-            if let connectionDirection {
-                let northYLayout = upperVertex.getHDirectionNeighbor(hLayout, in: .north)
-                let northVertex = VertexPosition(vertexLayout: .yLayout(northYLayout))
-                let northRoad = Road(roadPosition: [northVertex, upperVertex])
-                neighbors.append(northRoad)
-                switch connectionDirection {
-                case .southEast:
-                    let southWestYLayout = upperVertex.getHDirectionNeighbor(hLayout, in: .southWest)
-                    let southWestVertex = VertexPosition(vertexLayout: .yLayout(southWestYLayout))
-                    let southWestRoad = Road(roadPosition: [upperVertex, southWestVertex])
-                    neighbors.append(southWestRoad)
-                case .southWest:
-                    let southEastYLayout = upperVertex.getHDirectionNeighbor(hLayout, in: .southEast)
+            switch direction {
+            case .hNeighbor(let neighborDirection):
+                switch neighborDirection {
+                case .north:
+                    let southEastYLayout = vertex.getHDirectionNeighbor(hLayout, in: .southEast)
                     let southEastVertex = VertexPosition(vertexLayout: .yLayout(southEastYLayout))
-                    let southEastRoad = Road(roadPosition: [upperVertex, southEastVertex])
-                    neighbors.append(southEastRoad)
-                case .south: break
-                }
-            }
-        case .yLayout(let yLayout):
-            let northWestHLayout = upperVertex.getYDirectionNeighbor(yLayout, in: .northWest)
-            let northWestVertex = VertexPosition(vertexLayout: .hLayout(northWestHLayout))
-            let northEastHLayout = upperVertex.getYDirectionNeighbor(yLayout, in: .northEast)
-            let northEastVertex = VertexPosition(vertexLayout: .hLayout(northEastHLayout))
-            let northWestRoad = Road(roadPosition: [northWestVertex, upperVertex])
-            let northEastRoad = Road(roadPosition: [northEastVertex, upperVertex])
-            neighbors += [northWestRoad, northEastRoad]
-        }
-
-        switch lowerVertex.vertexLayout {
-        case .hLayout(let hLayout):
-            let southEastYLayout = lowerVertex.getHDirectionNeighbor(hLayout, in: .southEast)
-            let southEastVertex = VertexPosition(vertexLayout: .yLayout(southEastYLayout))
-            let southEastRoad = Road(roadPosition: [lowerVertex, southEastVertex])
-            let southWestYLayout = lowerVertex.getHDirectionNeighbor(hLayout, in: .southWest)
-            let southWestVertex = VertexPosition(vertexLayout: .yLayout(southWestYLayout))
-            let southWestRoad = Road(roadPosition: [lowerVertex, southWestVertex])
-            neighbors += [southEastRoad, southWestRoad]
-        case .yLayout(let yLayout):
-            let southHLayout = lowerVertex.getYDirectionNeighbor(yLayout, in: .south)
-            let southVertex = VertexPosition(vertexLayout: .hLayout(southHLayout))
-            let southRoad = Road(roadPosition: [lowerVertex, southVertex])
-            neighbors.append(southRoad)
-            if let connectionDirection {
-                switch connectionDirection {
+                    if southEastVertex.onTheField {
+                        let road = Road(roadPosition: [vertex, southEastVertex])
+                        result.append(road)
+                    }
+                    let southWestYLayout = vertex.getHDirectionNeighbor(hLayout, in: .southWest)
+                    let southWestVertex = VertexPosition(vertexLayout: .yLayout(southWestYLayout))
+                    if southWestVertex.onTheField {
+                        let road = Road(roadPosition: [vertex, southWestVertex])
+                        result.append(road)
+                    }
                 case .southEast:
-                    let northEastHLayout = lowerVertex.getYDirectionNeighbor(yLayout, in: .northEast)
-                    let northEastVertex = VertexPosition(vertexLayout: .hLayout(northEastHLayout))
-                    let northEastRoad = Road(roadPosition: [northEastVertex, lowerVertex])
-                    neighbors.append(northEastRoad)
+                    let northYLayout = vertex.getHDirectionNeighbor(hLayout, in: .north)
+                    let northVertex = VertexPosition(vertexLayout: .yLayout(northYLayout))
+                    if northVertex.onTheField {
+                        let road = Road(roadPosition: [vertex, northVertex])
+                        result.append(road)
+                    }
+                    let southWestYLayout = vertex.getHDirectionNeighbor(hLayout, in: .southWest)
+                    let southWestVertex = VertexPosition(vertexLayout: .yLayout(southWestYLayout))
+                    if southWestVertex.onTheField {
+                        let road = Road(roadPosition: [vertex, southWestVertex])
+                        result.append(road)
+                    }
                 case .southWest:
-                    let northWestHLayout = lowerVertex.getYDirectionNeighbor(yLayout, in: .northWest)
-                    let northWestVertex = VertexPosition(vertexLayout: .hLayout(northWestHLayout))
-                    let northWestRoad = Road(roadPosition: [northWestVertex, lowerVertex])
-                    neighbors.append(northWestRoad)
-                default: break
+                    let northYLayout = vertex.getHDirectionNeighbor(hLayout, in: .north)
+                    let northVertex = VertexPosition(vertexLayout: .yLayout(northYLayout))
+                    if northVertex.onTheField {
+                        let road = Road(roadPosition: [vertex, northVertex])
+                        result.append(road)
+                    }
+                    let southEastYLayout = vertex.getHDirectionNeighbor(hLayout, in: .southEast)
+                    let southEastVertex = VertexPosition(vertexLayout: .yLayout(southEastYLayout))
+                    if southEastVertex.onTheField {
+                        let road = Road(roadPosition: [vertex, southEastVertex])
+                        result.append(road)
+                    }
                 }
+            case .yNeighbor: break
             }
-
+        case .yLayout(let yLayout):
+            switch direction {
+            case .yNeighbor(let neighborDirection):
+                switch neighborDirection {
+                case .northEast:
+                    let northWestHLayout = vertex.getYDirectionNeighbor(yLayout, in: .northWest)
+                    let northWestVertex = VertexPosition(vertexLayout: .hLayout(northWestHLayout))
+                    if northWestVertex.onTheField {
+                        let road = Road(roadPosition: [vertex, northWestVertex])
+                        result.append(road)
+                    }
+                    let southHLayout = vertex.getYDirectionNeighbor(yLayout, in: .south)
+                    let southVertex = VertexPosition(vertexLayout: .hLayout(southHLayout))
+                    if southVertex.onTheField {
+                        let road = Road(roadPosition: [vertex, southVertex])
+                        result.append(road)
+                    }
+                case .northWest:
+                    let northEastHLayout = vertex.getYDirectionNeighbor(yLayout, in: .northEast)
+                    let northEastVertex = VertexPosition(vertexLayout: .hLayout(northEastHLayout))
+                    if northEastVertex.onTheField {
+                        let road = Road(roadPosition: [vertex, northEastVertex])
+                        result.append(road)
+                    }
+                    let southHLayout = vertex.getYDirectionNeighbor(yLayout, in: .south)
+                    let southVertex = VertexPosition(vertexLayout: .hLayout(southHLayout))
+                    if southVertex.onTheField {
+                        let road = Road(roadPosition: [vertex, southVertex])
+                        result.append(road)
+                    }
+                case .south:
+                    let northEastHLayout = vertex.getYDirectionNeighbor(yLayout, in: .northEast)
+                    let northEastVertex = VertexPosition(vertexLayout: .hLayout(northEastHLayout))
+                    if northEastVertex.onTheField {
+                        let road = Road(roadPosition: [vertex, northEastVertex])
+                        result.append(road)
+                    }
+                }
+                let northWestHLayout = vertex.getYDirectionNeighbor(yLayout, in: .northWest)
+                let northWestVertex = VertexPosition(vertexLayout: .hLayout(northWestHLayout))
+                if northWestVertex.onTheField {
+                    let road = Road(roadPosition: [vertex, northWestVertex])
+                    result.append(road)
+                }
+            case .hNeighbor: break
+            }
         }
-
-        return neighbors
+        return result
     }
 }

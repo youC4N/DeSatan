@@ -90,7 +90,7 @@ struct GridLayoutEngine {
 
 
     func vertexCoordinates(for vertexPosition: VertexPosition) -> CGPoint {
-        let neighbors = vertexPosition.vertexLayout.vertices
+        let neighbors = vertexPosition.vertices
 
         let xFirstCenter = getHexCenter(for: neighbors[0]).x
         let yFirstCenter = getHexCenter(for: neighbors[0]).y
