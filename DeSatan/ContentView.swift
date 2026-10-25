@@ -21,9 +21,11 @@ struct HexagonGame {
 
 struct ContentView: View {
     @State var gridViewModel: GridViewModel
+    @State var router: GridRouter
 
-    init() {
+    init(applicationRouter: ApplicationRouter) {
         self._gridViewModel = State(initialValue: GridViewModel(coreGame: CoreGame()))
+        _router = State(initialValue: GridRouter(applicationRouter: applicationRouter))
     }
     var body: some View {
         GeometryReader { geometry in
@@ -59,5 +61,5 @@ struct ContentView: View {
 }
 
 #Preview {
-    ContentView()
+    ContentView(applicationRouter: ApplicationRouter())
 }
