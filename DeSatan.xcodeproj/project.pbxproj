@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		E6098A242FF2A70600B9C83D /* Algorithms in Frameworks */ = {isa = PBXBuildFile; productRef = E6098A232FF2A70600B9C83D /* Algorithms */; };
+		E65981CF309CBDF60098B518 /* Algorithms in Frameworks */ = {isa = PBXBuildFile; productRef = E65981CE309CBDF60098B518 /* Algorithms */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -28,7 +28,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				E6098A242FF2A70600B9C83D /* Algorithms in Frameworks */,
+				E65981CF309CBDF60098B518 /* Algorithms in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -72,7 +72,7 @@
 			);
 			name = DeSatan;
 			packageProductDependencies = (
-				E6098A232FF2A70600B9C83D /* Algorithms */,
+				E65981CE309CBDF60098B518 /* Algorithms */,
 			);
 			productName = DeSatan;
 			productReference = E630D9572F4113BC00C8FA15 /* DeSatan.app */;
@@ -103,7 +103,8 @@
 			mainGroup = E630D94E2F4113BC00C8FA15;
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
-				E6098A222FF2A70600B9C83D /* XCRemoteSwiftPackageReference "swift-algorithms" */,
+				E65981CC309B84F20098B518 /* XCRemoteSwiftPackageReference "swift-nio" */,
+				E65981CD309CBDF60098B518 /* XCRemoteSwiftPackageReference "swift-algorithms" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = E630D9582F4113BC00C8FA15 /* Products */;
@@ -341,7 +342,15 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		E6098A222FF2A70600B9C83D /* XCRemoteSwiftPackageReference "swift-algorithms" */ = {
+		E65981CC309B84F20098B518 /* XCRemoteSwiftPackageReference "swift-nio" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/apple/swift-nio.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.105.0;
+			};
+		};
+		E65981CD309CBDF60098B518 /* XCRemoteSwiftPackageReference "swift-algorithms" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/apple/swift-algorithms.git";
 			requirement = {
@@ -352,9 +361,9 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		E6098A232FF2A70600B9C83D /* Algorithms */ = {
+		E65981CE309CBDF60098B518 /* Algorithms */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = E6098A222FF2A70600B9C83D /* XCRemoteSwiftPackageReference "swift-algorithms" */;
+			package = E65981CD309CBDF60098B518 /* XCRemoteSwiftPackageReference "swift-algorithms" */;
 			productName = Algorithms;
 		};
 /* End XCSwiftPackageProductDependency section */

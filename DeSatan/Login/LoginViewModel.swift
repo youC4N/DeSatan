@@ -8,7 +8,7 @@
 import SwiftUI
 
 @Observable class LoginViewModel {
-    let router: LoginRouter
+    var router: LoginRouter
     var loginInput = ""
     var passwordInput = ""
 

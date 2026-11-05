@@ -11,7 +11,22 @@ protocol FeatureRouter {
     associatedtype Route: Hashable
     var applicationRouter: ApplicationRouter { get }
     var path: NavigationPath { get set }
-    func push(_ route: Route)
-    func pop()
-    func popToRoot()
+    mutating func push(_ route: Route)
+    mutating func pop()
+    mutating func popToRoot()
+}
+
+extension FeatureRouter {
+    mutating func push(_ route: Route) {
+        path.append(route)
+    }
+
+    mutating func pop() {
+        guard !path.isEmpty else { return }
+        path.removeLast()
+    }
+
+    mutating func popToRoot() {
+        path.removeLast(path.count)
+    }
 }

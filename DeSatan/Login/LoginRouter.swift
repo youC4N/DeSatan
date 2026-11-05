@@ -21,19 +21,6 @@ class LoginRouter: FeatureRouter {
         case registration
     }
 
-    func push(_ route: Route) {
-        path.append(route)
-    }
-
-    func pop() {
-        guard !path.isEmpty else { return }
-        path.removeLast()
-    }
-
-    func popToRoot() {
-        path.removeLast(path.count)
-    }
-
     func loginTap() {
         applicationRouter.move(to: .grid)
     }
